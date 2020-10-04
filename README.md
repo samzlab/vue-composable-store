@@ -126,3 +126,16 @@ defineStore('my-store', ({ mylib }) => {  // <--- get the plugins in the passed 
 });
 ```
 
+
+
+## Changelog
+
+See the [CHANGELOG.md](./CHANGELOG.md) 
+
+
+
+## License
+
+Copyright © 2020 Kövesdi György
+
+Licensed under the [MIT License](https://github.com/samzlab/tailwind-hsluv/blob/master/LICENSE).
