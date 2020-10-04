@@ -1,7 +1,7 @@
 {
   "name": "vue-composable-store",
   "description": "Vue composable store",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": false,
   "author": "Kövesdi György <hello@samzlab.hu>",
   "module": "dist/index.js",
