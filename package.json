@@ -1,0 +1,60 @@
+{
+  "name": "vue-composable-store",
+  "version": "0.1.0",
+  "private": false,
+  "author": "Kövesdi György <hello@samzlab.hu>",
+  "module": "dist/index.js",
+  "type": "module",
+  "types": "dist/index.d.ts",
+  "keywords": [
+    "vue",
+    "vuex",
+    "store"
+  ],
+  "scripts": {
+    "test": "jest",
+    "build:coverage": "make-coverage-badge",
+    "build": "esbuild src/index.ts --outdir=dist && tsc -d --declarationDir dist -t esnext --moduleResolution node src/index.ts",
+    "prerelease": "npm test && npm run build:coverage && npm run build",
+    "release": "standard-version",
+    "push": "git push --follow-tags origin master && npm publish"
+  },
+  "files": [
+    "src/*",
+    "dist/*"
+  ],
+  "devDependencies": {
+    "make-coverage-badge": "^1.2.0",
+    "standard-version": "^9.0.0",
+    "@babel/core": "^7.11.6",
+    "@babel/preset-env": "^7.11.5",
+    "@babel/preset-typescript": "^7.10.4",
+    "@koffeine/eslint-config": "16.0.1",
+    "@types/jest": "^26.0.14",
+    "@typescript-eslint/eslint-plugin": "^4.3.0",
+    "@typescript-eslint/parser": "^4.3.0",
+    "babel-jest": "^26.3.0",
+    "esbuild": "^0.7.8",
+    "eslint": "7.9.0",
+    "jest": "^26.4.2",
+    "tslib": "^2.0.1",
+    "typescript": "^4.0.3",
+    "vue": "^3.0"
+  },
+  "peerDependencies": {
+    "vue": ">3.0"
+  },
+  "jest": {
+    "verbose": true,
+    "collectCoverage": true,
+    "testEnvironment": "jsdom",
+    "coverageReporters": [
+      "json-summary",
+      "text"
+    ],
+    "displayName": {
+      "name": "Package: vue-composable-store",
+      "color": "blue"
+    }
+  }
+}
