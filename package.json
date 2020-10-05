@@ -17,7 +17,7 @@
   "scripts": {
     "test": "jest",
     "build:coverage": "make-coverage-badge",
-    "build": "esbuild src/index.ts --outdir=dist && tsc -d --declarationDir dist -t esnext --moduleResolution node src/index.ts",
+    "build": "rollup -c",
     "prerelease": "npm test && npm run build:coverage && npm run build",
     "release": "standard-version",
     "push": "git push --follow-tags origin master && npm publish"

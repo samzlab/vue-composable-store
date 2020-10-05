@@ -23,7 +23,7 @@ const options = {
     plugins: [
         nodeResolve(),
         typescript({
-            exclude: '__tests__/*'
+            include: 'src/**/*.ts'
         }),
         filesize()
     ]
