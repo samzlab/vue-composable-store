@@ -4,6 +4,7 @@ devDependencies:
   '@babel/preset-typescript': 7.10.4_@babel+core@7.11.6
   '@koffeine/eslint-config': 16.0.1_eslint@7.9.0
   '@rollup/plugin-node-resolve': 9.0.0_rollup@2.28.2
+  '@rollup/plugin-strip': 2.0.0_rollup@2.28.2
   '@rollup/plugin-typescript': 6.0.0_cdbdda34bbbc534f7b00e9e97d2f15aa
   '@types/jest': 26.0.14
   '@typescript-eslint/eslint-plugin': 4.3.0_8e45c5a84eae06263426995c6a3e2b86
@@ -1342,6 +1343,17 @@ packages:
       rollup: ^1.20.0||^2.0.0
     resolution:
       integrity: sha512-gPz+utFHLRrd41WMP13Jq5mqqzHL3OXrfj3/MkSyB6UBIcuNt9j60GCbarzMzdf1VHFpOxfQh/ez7wyadLMqkg==
+  /@rollup/plugin-strip/2.0.0_rollup@2.28.2:
+    dependencies:
+      '@rollup/pluginutils': 3.1.0_rollup@2.28.2
+      estree-walker: 1.0.1
+      magic-string: 0.25.7
+      rollup: 2.28.2
+    dev: true
+    peerDependencies:
+      rollup: ^1.20.0 || ^2.0.0
+    resolution:
+      integrity: sha512-1xtE2FDk7Wwr2dEPugkQp3M2FGtSVYeRQaJnHJIkHzcXpBlxT/z+jJoVUvm8LGXso+bLWgO65WrmQ6bC6e/x+A==
   /@rollup/plugin-typescript/6.0.0_cdbdda34bbbc534f7b00e9e97d2f15aa:
     dependencies:
       '@rollup/pluginutils': 3.1.0_rollup@2.28.2
@@ -4964,6 +4976,12 @@ packages:
       node: '>=10'
     resolution:
       integrity: sha512-Jo6dJ04CmSjuznwJSS3pUeWmd/H0ffTlkXXgwZi+eq1UCmqQwCh+eLsYOYCwY991i2Fah4h1BEMCx4qThGbsiA==
+  /magic-string/0.25.7:
+    dependencies:
+      sourcemap-codec: 1.4.8
+    dev: true
+    resolution:
+      integrity: sha512-4CrMT5DOHTDk4HYDlzmwu4FVCcIYI8gauveasrdCu2IKIFOJ3f0v/8MDGJCDL9oD2ppz/Av1b0Nj345H9M+XIA==
   /make-coverage-badge/1.2.0:
     dependencies:
       mri: 1.1.4
@@ -6644,6 +6662,10 @@ packages:
       node: '>= 8'
     resolution:
       integrity: sha512-CkCj6giN3S+n9qrYiBTX5gystlENnRW5jZeNLHpe6aue+SrHcG5VYwujhW9s4dY31mEGsxBDrHR6oI69fTXsaQ==
+  /sourcemap-codec/1.4.8:
+    dev: true
+    resolution:
+      integrity: sha512-9NykojV5Uih4lgo5So5dtw+f0JgJX30KCNI8gwhz2J9A15wD0Ml6tjHKwf6fTSa6fAdVBdZeNOs9eJ71qCk8vA==
   /spdx-correct/3.1.1:
     dependencies:
       spdx-expression-parse: 3.0.1
@@ -7565,6 +7587,7 @@ specifiers:
   '@babel/preset-typescript': ^7.10.4
   '@koffeine/eslint-config': 16.0.1
   '@rollup/plugin-node-resolve': ^9.0.0
+  '@rollup/plugin-strip': ^2.0.0
   '@rollup/plugin-typescript': ^6.0.0
   '@types/jest': ^26.0.14
   '@typescript-eslint/eslint-plugin': ^4.3.0

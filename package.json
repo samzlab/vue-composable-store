@@ -6,7 +6,7 @@
   "author": "Kövesdi György <hello@samzlab.hu>",
   "license": "MIT",
   "module": "dist/index-es.js",
-  "main": "dist/index-cjs",
+  "main": "dist/index-cjs.js",
   "type": "module",
   "types": "dist/index.d.ts",
   "keywords": [
@@ -32,6 +32,7 @@
     "@babel/preset-typescript": "^7.10.4",
     "@koffeine/eslint-config": "16.0.1",
     "@rollup/plugin-node-resolve": "^9.0.0",
+    "@rollup/plugin-strip": "^2.0.0",
     "@rollup/plugin-typescript": "^6.0.0",
     "@types/jest": "^26.0.14",
     "@typescript-eslint/eslint-plugin": "^4.3.0",

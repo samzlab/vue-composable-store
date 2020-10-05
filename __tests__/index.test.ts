@@ -1,4 +1,4 @@
-import { createVueStore, defineStore, useStore } from '../src/index';
+import { createVueStore, defineStore, useStore } from '../src/';
 import { computed, createApp, nextTick, ref } from 'vue';
 
 const body = document.body;
@@ -23,18 +23,16 @@ const myStore = defineStore('myStore', myStoreSetup);
 
 describe('Plugin validations', () => {
 
+    function buildApp(plugins1, plugins2 = {}) {
+        return createApp(document.createElement('div')).use(createVueStore(plugins1), plugins2);
+    }
+
     test('Should throw on invalid plugins option (string)', () => {
-        expect(() => createVueStore({
-            // @ts-ignore
-            plugins: 'meh'
-        })).toThrow('`createVueStore`: `options.plugins` must be an `Array`');
+        expect(() => buildApp({ plugins: 'meh' })).toThrow('VueStore plugins must be an array');
     });
 
     test('Should throw on invalid plugin (string)', () => {
-        expect(() => createVueStore({
-            // @ts-ignore
-            plugins: [ 'meh' ]
-        })).toThrow('VueStorePlugin must be a function (instead of `string`)');
+        expect(() => buildApp({ plugins: [ 'meh' ] })).toThrow('VueStorePlugin must be a function (instead of `string`)');
     });
 
     test('Should throw on invalid provided name/value', () => {
@@ -42,20 +40,12 @@ describe('Plugin validations', () => {
         const plugin2 = (provide) => provide(' ');
         const plugin3 = (provide) => provide('kek');
 
-        expect(() => createVueStore({
-            // @ts-ignore
-            plugins: [plugin]
-        })).toThrow('VueStorePlugin names must be a valid string. Invalid name: undefined');
+        expect(() => buildApp({ plugins: [ plugin ] })).toThrow('VueStorePlugin names must be a valid string. Invalid name: undefined');
+        expect(() => buildApp({}, { plugins: [ plugin ] })).toThrow('VueStorePlugin names must be a valid string. Invalid name: undefined');
 
-        expect(() => createVueStore({
-            // @ts-ignore
-            plugins: [plugin2]
-        })).toThrow('VueStorePlugin names must be a valid string. Invalid name: " "');
+        expect(() => buildApp({ plugins: [ plugin2 ] })).toThrow('VueStorePlugin names must be a valid string. Invalid name: " "');
 
-        expect(() => createVueStore({
-            // @ts-ignore
-            plugins: [plugin3]
-        })).toThrow('VueStorePlugin (kek) does not provided anything');
+        expect(() => buildApp({ plugins: [ plugin3 ] })).toThrow('VueStorePlugin (kek) does not provided anything');
     });
 
 });
@@ -100,6 +90,25 @@ describe('Basic store functionality', () => {
 		await nextTick();
 		expect(hosts.one.textContent).toEqual('count: 1');
 	});
+
+});
+
+
+describe('Validations', () => {
+
+	test('should throw on invalid store definition in useStore()', () => {
+        // @ts-ignore
+		expect(() => useStore({})).toThrow('useStore: invalid store definition');
+    });
+
+    test('should throw on invalid store definition in defineStore()', () => {
+        // @ts-ignore
+        expect(() => defineStore() ).toThrow('defineStore: invalid store definition');
+        // @ts-ignore
+        expect(() => defineStore(false) ).toThrow('defineStore: invalid store definition');
+        // @ts-ignore
+        expect(() => defineStore(false, null) ).toThrow('defineStore: invalid store definition');
+    });
 
 });
 

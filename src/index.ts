@@ -11,11 +11,14 @@ type StoreSetupFunction = (context: storeContext) => object
 type StoreDefinition = { name: string, setup: StoreSetupFunction };
 type VueStoreInstance = { stores: { [name: string]: object }, context: storeContext };
 
+function validateStoreDefinition({ name = '', setup = null }: StoreDefinition, fnName: string): void {
+    assert(typeof name === 'string' && name.length > 0 && typeof setup === 'function', `${fnName}: invalid store definition`);
+}
+
 export function defineStore(name: string, setup: StoreSetupFunction): StoreDefinition {
-	return {
-		name,
-		setup
-	};
+    const def = { name, setup };
+    validateStoreDefinition(def, 'defineStore');
+	return def;
 }
 
 function registerStore(instance: VueStoreInstance, { name, setup }: StoreDefinition) {
@@ -29,8 +32,8 @@ function registerStore(instance: VueStoreInstance, { name, setup }: StoreDefinit
 }
 
 export function useStore(storeDefinition: StoreDefinition) {
-	const vueStore: VueStoreInstance = inject(VueStoreSymbol);
-	return registerStore(vueStore, storeDefinition);
+    validateStoreDefinition(storeDefinition, 'useStore');
+	return registerStore(inject(VueStoreSymbol), storeDefinition);
 }
 
 type StorePluginInstaller = (pluginName: string, plugin: Function) => void;
@@ -40,33 +43,36 @@ interface StoreOptions {
 	plugins?: StorePluginProvider[]
 };
 
-export function createVueStore({ plugins = null }: StoreOptions = {}): Plugin {
-	const instance: VueStoreInstance = {
-		stores: {},
-		context: {
-			use: (storeDefinition: StoreDefinition) => registerStore(instance, storeDefinition)
-		}
-	};
+export function createVueStore(options1: StoreOptions = {}): Plugin {
+	return (app, options2: StoreOptions = {}): void => {
+        const { plugins } = { plugins: [], ...options1, ...options2 } as StoreOptions;
 
-	if (plugins) {
-		assert(plugins instanceof Array, '`createVueStore`: `options.plugins` must be an `Array`');
+        const instance: VueStoreInstance = {
+            stores: {},
+            context: {
+                use: (storeDefinition: StoreDefinition) => registerStore(instance, storeDefinition)
+            }
+        };
 
-		function installer(pluginName: string, plugin: any): void {
-            assert(typeof pluginName === 'string' && pluginName.trim().length > 0, `VueStorePlugin names must be a valid string. Invalid name: ${JSON.stringify(pluginName)}`);
-            assert(typeof instance.context[pluginName] === 'undefined', `VueStorePlugin names must be unique. Duplicate name: "${pluginName}"`);
-            assert(typeof plugin !== 'undefined', `VueStorePlugin (${pluginName}) does not provided anything`);
+        assert(plugins instanceof Array, 'VueStore plugins must be an array');
 
-			instance.context[pluginName] = plugin;
-		}
+        if (plugins.length) {
 
-		for (let i = 0, len = plugins.length; i < len; i++) {
-			assert(typeof plugins[i] === 'function', `VueStorePlugin must be a function (instead of \`${typeof plugins[i]}\`)`);
+            function installer(pluginName: string, plugin: any): void {
+                assert(typeof pluginName === 'string' && pluginName.trim().length > 0, `VueStorePlugin names must be a valid string. Invalid name: ${JSON.stringify(pluginName)}`);
+                assert(typeof instance.context[pluginName] === 'undefined', `VueStorePlugin names must be unique. Duplicate name: "${pluginName}"`);
+                assert(typeof plugin !== 'undefined', `VueStorePlugin (${pluginName}) does not provided anything`);
 
-			plugins[i](installer);
-		}
-	}
+                instance.context[pluginName] = plugin;
+            }
 
-	return (app) => {
+            for (let i = 0, len = plugins.length; i < len; i++) {
+                assert(typeof plugins[i] === 'function', `VueStorePlugin must be a function (instead of \`${typeof plugins[i]}\`)`);
+
+                plugins[i](installer);
+            }
+        }
+
 		app.provide(VueStoreSymbol, instance);
 	};
 }
