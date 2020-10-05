@@ -19,11 +19,48 @@ const myStoreSetup = jest.fn(() => {
 	};
 });
 
-
 const myStore = defineStore('myStore', myStoreSetup);
 
-describe('Basic store functionality', () => {
+describe('Plugin validations', () => {
 
+    test('Should throw on invalid plugins option (string)', () => {
+        expect(() => createVueStore({
+            // @ts-ignore
+            plugins: 'meh'
+        })).toThrow('`createVueStore`: `options.plugins` must be an `Array`');
+    });
+
+    test('Should throw on invalid plugin (string)', () => {
+        expect(() => createVueStore({
+            // @ts-ignore
+            plugins: [ 'meh' ]
+        })).toThrow('VueStorePlugin must be a function (instead of `string`)');
+    });
+
+    test('Should throw on invalid provided name/value', () => {
+        const plugin = (provide) => provide();
+        const plugin2 = (provide) => provide(' ');
+        const plugin3 = (provide) => provide('kek');
+
+        expect(() => createVueStore({
+            // @ts-ignore
+            plugins: [plugin]
+        })).toThrow('VueStorePlugin names must be a valid string. Invalid name: undefined');
+
+        expect(() => createVueStore({
+            // @ts-ignore
+            plugins: [plugin2]
+        })).toThrow('VueStorePlugin names must be a valid string. Invalid name: " "');
+
+        expect(() => createVueStore({
+            // @ts-ignore
+            plugins: [plugin3]
+        })).toThrow('VueStorePlugin (kek) does not provided anything');
+    });
+
+});
+
+describe('Basic store functionality', () => {
 
 	let exposedStore;
 	const app = createApp({

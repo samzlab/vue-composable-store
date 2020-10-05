@@ -51,8 +51,11 @@ export function createVueStore({ plugins = null }: StoreOptions = {}): Plugin {
 	if (plugins) {
 		assert(plugins instanceof Array, '`createVueStore`: `options.plugins` must be an `Array`');
 
-		function installer(pluginName: string, plugin: Function): void {
-			assert(typeof instance.context[pluginName] === 'undefined', `VueStorePlugin names must be unique. Duplicate name: ${pluginName}`);
+		function installer(pluginName: string, plugin: any): void {
+            assert(typeof pluginName === 'string' && pluginName.trim().length > 0, `VueStorePlugin names must be a valid string. Invalid name: ${JSON.stringify(pluginName)}`);
+            assert(typeof instance.context[pluginName] === 'undefined', `VueStorePlugin names must be unique. Duplicate name: "${pluginName}"`);
+            assert(typeof plugin !== 'undefined', `VueStorePlugin (${pluginName}) does not provided anything`);
+
 			instance.context[pluginName] = plugin;
 		}
 
