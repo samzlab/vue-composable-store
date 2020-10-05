@@ -4,6 +4,7 @@
   "version": "0.1.1",
   "private": false,
   "author": "Kövesdi György <hello@samzlab.hu>",
+  "license": "MIT",
   "module": "dist/index.js",
   "type": "module",
   "types": "dist/index.d.ts",
