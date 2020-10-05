@@ -3,8 +3,7 @@ function assert(valid, error) {
     if (!valid)
         throw new Error(error);
 }
-// exported only for tests
-export const VueStoreSymbol = Symbol.for('VueStore');
+const VueStoreSymbol = Symbol();
 export function defineStore(name, setup) {
     return {
         name,

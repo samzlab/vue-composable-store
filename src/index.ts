@@ -4,8 +4,7 @@ function assert(valid: boolean, error: string): void {
 	if (!valid) throw new Error(error);
 }
 
-// exported only for tests
-export const VueStoreSymbol = Symbol.for('VueStore');
+const VueStoreSymbol = Symbol();
 
 type storeContext = { [plugin: string]: any };
 type StoreSetupFunction = (context: storeContext) => object
