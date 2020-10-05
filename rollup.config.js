@@ -7,39 +7,29 @@ import { peerDependencies } from './package.json'
 
 const external = [ 'vue', ...Object.keys(peerDependencies) ];
 
-/** @type {import('rollup').RollupOptions['output']} */
-const output = {
-    format: 'esm',
-    dir: 'dist',
-    entryFileNames: '[name]-[format].js'
-};
+function getOptions(format, plugins = []) {
+    /** @type {import('rollup').RollupOptions} */
+    const options = {
+        input: 'src/index.ts',
+        external,
+        output: {
+            format,
+            dir: 'dist',
+            entryFileNames: '[name]-[format].js'
+        },
+        plugins: [
+            nodeResolve(),
+            typescript({
+                include: 'src/**/*.ts'
+            }),
+            ...plugins
+        ]
+    };
 
-
-/** @type {import('rollup').RollupOptions} */
-const options = {
-    input: 'src/index.ts',
-    external,
-    output,
-    plugins: [
-        nodeResolve(),
-        typescript({
-            include: 'src/**/*.ts'
-        }),
-        filesize()
-    ]
-};
+    return options;
+}
 
 export default [
-	{
-        ...options,
-        output: {
-            ...output,
-            format: 'cjs'
-        }
-    },
-    /** @type {import('rollup').RollupOptions} */
-	{
-		...options,
-		output
-	}
+    getOptions('cjs', [ filesize() ]),
+    getOptions('esm')
 ];
