@@ -53,7 +53,7 @@
   },
   "jest": {
     "verbose": true,
-    "collectCoverage": true,
+    "collectCoverage": false,
     "testEnvironment": "jsdom",
     "coverageReporters": [
       "json-summary",
