@@ -1,6 +1,10 @@
 import { createVueStore, defineStore, StorePlugin, useStore } from '../src/';
 import { computed, createApp, nextTick, ref } from 'vue';
 
+function createHost() {
+	return document.createElement('div');
+}
+
 const body = document.body;
 const hosts = { one: null, two: null };
 body.appendChild(hosts.one = document.createElement('div'));
@@ -173,11 +177,6 @@ describe('Store composition and multi-app, plugins', () => {
 
 
 });
-
-
-function createHost() {
-	return document.createElement('div');
-}
 
 describe('plugin system', () => {
 
