@@ -10,19 +10,21 @@ const
     isFunction = (val: any): boolean => typeof val === 'function',
     isUndef = (val: any): boolean => typeof val === 'undefined';
 
-export interface StoreInstance {
+export type StoreInstance = {
     [key: string]: any
 }
 
-export type StoreSetupFunction = (context: StoreContext) => StoreInstance;
+export interface StoreSetupFunction<T extends StoreInstance> {
+    (context: StoreContext): T
+}
 
-export interface StoreDefinition {
+export interface StoreDefinition<T> {
     name: string,
-    setup: StoreSetupFunction
+    setup: StoreSetupFunction<T>
 }
 
 export interface StoreContext {
-    use: (storeDefinition) => StoreInstance,
+    use: <T>(storeDefinition: StoreDefinition<T>) => T,
     [pluginName: string]: any
 }
 
@@ -37,11 +39,11 @@ export type VueStoreInstance = {
     }
 };
 
-function validateStoreDefinition({ name = '', setup = null }: StoreDefinition, fnName: string): void {
+function validateStoreDefinition<T>({ name = '', setup = null }: StoreDefinition<T>, fnName: string): void {
     assert(typeof name === 'string' && name.length > 0 && isFunction(setup), `${fnName}: invalid store definition`);
 }
 
-export function defineStore(name: string, setup: StoreSetupFunction): StoreDefinition {
+export function defineStore<T extends StoreInstance>(name: string, setup: StoreSetupFunction<T>): StoreDefinition<T> {
     const def = { name, setup };
     validateStoreDefinition(def, 'defineStore');
 	return def;
@@ -55,7 +57,7 @@ const wrapAction = <T extends Array<any>, U>(fn: (...args: T) => U, listeners, n
     }
 }
 
-function registerStore(instance: VueStoreInstance, { name, setup }: StoreDefinition): object {
+function registerStore<T>(instance: VueStoreInstance, { name, setup }: StoreDefinition<T>): T {
 
 	const { stores, context, listeners } = instance;
 
@@ -70,10 +72,10 @@ function registerStore(instance: VueStoreInstance, { name, setup }: StoreDefinit
 
         for( let key in store ) {
             if (hasActionListeners && isFunction(store[key])) {
-                store[key] = wrapAction(store[key], listeners.action, name, store, key, context);
+                store[key as string] = wrapAction(store[key as string], listeners.action, name, store, key, context);
             }
             if (hasMutateListeners && isReactive(store[key]) || isRef(store[key])) {
-                watch(store[key], (value, oldValue) => {
+                watch(store[key as string], (value, oldValue) => {
                     callListeners(listeners.mutate, name, stores[name], key, value, oldValue, context);
                 });
             }
@@ -84,7 +86,7 @@ function registerStore(instance: VueStoreInstance, { name, setup }: StoreDefinit
 
     callListeners(listeners[hook], name, stores[name], context);
 
-	return stores[name];
+	return stores[name] as T;
 }
 
 function callListeners(listeners: Function[], ...params): void {
@@ -93,7 +95,7 @@ function callListeners(listeners: Function[], ...params): void {
     }
 }
 
-export function useStore(storeDefinition: StoreDefinition) {
+export function useStore<T>(storeDefinition: StoreDefinition<T>): T {
     validateStoreDefinition(storeDefinition, 'useStore');
 
     return registerStore(inject(VueStoreSymbol) as VueStoreInstance, storeDefinition);
@@ -118,7 +120,7 @@ export interface StoreOptions {
 };
 
 export function createVueStore(options1: StoreOptions = {}): Plugin {
-	return (app, options2: StoreOptions = {}): void => {
+	const install = (app, options2: StoreOptions = {}): void => {
         const { plugins } = { plugins: [], ...options1, ...options2 } as StoreOptions;
 
         const
@@ -130,7 +132,7 @@ export function createVueStore(options1: StoreOptions = {}): Plugin {
         const instance: VueStoreInstance = {
             stores: {},
             context: {
-                use: (storeDefinition: StoreDefinition) => registerStore(instance, storeDefinition)
+                use: <T>(storeDefinition: StoreDefinition<T>): T => registerStore(instance, storeDefinition)
             },
             listeners: { use, init, action, mutate }
         };
@@ -163,5 +165,9 @@ export function createVueStore(options1: StoreOptions = {}): Plugin {
         }
 
 		app.provide(VueStoreSymbol, instance);
-	};
+    };
+
+    return {
+        install
+    };
 }

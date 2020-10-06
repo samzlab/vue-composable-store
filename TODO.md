@@ -5,7 +5,7 @@
 * [x] test negative branches
 * [x] accept options in the vue-plugin initialization: `app.use(store, { plugins?: [] })`
 * [x] plugin hooks
-* [ ] Better TypeScript support in useStore(), use() and in StoreContext
+* [x] Better TypeScript support in useStore(), use() in StoreContext
 * [ ] example projects
 
 
