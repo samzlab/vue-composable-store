@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.3](https://github.com/samzlab/vue-composable-store/compare/v0.1.2...v0.1.3) (2020-10-06)
+
+
+### Bug Fixes
+
+* return types from useStore() and context.use() ([2c2f34d](https://github.com/samzlab/vue-composable-store/commit/2c2f34dd04430310f36b60bebf2afca76a25eed4))
+
 ### [0.1.2](https://github.com/samzlab/vue-composable-store/compare/v0.1.1...v0.1.2) (2020-10-06)
 
 
