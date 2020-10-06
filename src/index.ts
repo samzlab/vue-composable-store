@@ -49,8 +49,9 @@ export function defineStore<T extends StoreInstance>(name: string, setup: StoreS
 	return def;
 }
 
-const wrapAction = <T extends Array<any>, U>(fn: (...args: T) => U, listeners, name, store, key, context) => {
-    return (...args: T): U => {
+type arrowFn = (...args) => any;
+const wrapAction = <T extends arrowFn>(fn: T, listeners: Function[], name: string, store: StoreInstance, key: string, context: StoreContext) => {
+    return (...args: Parameters<T>): ReturnType<T> => {
         const result = fn(...args);
         callListeners(listeners, name, store, key, args, result, context);
         return result;
