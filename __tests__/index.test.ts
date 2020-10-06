@@ -66,8 +66,8 @@ describe('Basic store functionality', () => {
 		}
 	});
 
-	// @ts-expect-error
-	const installer = jest.fn(createVueStore());
+	const vueStore = createVueStore();
+	const installer = jest.fn(vueStore.install);
 
 	app.use(installer);
 
@@ -209,7 +209,7 @@ describe('plugin system', () => {
     const compoundStore = defineStore('compound', ({ use }) => {
         const test = use(testStore);
         test.status.value = 'success';
-        test.moo('a', 'b', 'c');
+        test.moo('a', 'b', 1);
         return {};
     });
 
@@ -239,7 +239,7 @@ describe('plugin system', () => {
     });
 
     test('should call onAction when a store function invoked', () => {
-        expect(onActionCallback).toBeCalledWith('test', expect.anything(), 'moo', ['a', 'b', 'c'], 'd', expect.anything());
+        expect(onActionCallback).toBeCalledWith('test', expect.anything(), 'moo', ['a', 'b', 1], 'd', expect.anything());
     });
 
     test('should call onMutate only once when a store property mutated', () => {
