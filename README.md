@@ -1,4 +1,4 @@
-[![npm](https://img.shields.io/npm/v/vue-composable-store)](https://www.npmjs.com/package/vue-composable-store) ![downloads](https://img.shields.io/npm/dm/vue-composable-store) [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://conventionalcommits.org)![coverage](./coverage/badge.svg) [![Coverage badge](https://img.shields.io/npm/l/make-coverage-badge.svg)](https://github.com/samzlab/tailwind-hsluv/blob/master/LICENSE)
+[![npm](https://img.shields.io/npm/v/vue-composable-store)](https://www.npmjs.com/package/vue-composable-store) ![downloads](https://img.shields.io/npm/dm/vue-composable-store) [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://conventionalcommits.org)![coverage](./coverage/badge.svg) [![Coverage badge](https://img.shields.io/npm/l/make-coverage-badge.svg)](https://github.com/samzlab/tailwind-hsluv/blob/master/LICENSE) [![Build Status](https://travis-ci.org/samzlab/vue-composable-store.svg?branch=master)](https://travis-ci.org/samzlab/vue-composable-store)
 
 # Vue composable store
 
