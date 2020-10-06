@@ -2,17 +2,17 @@
 
 # Vue composable store
 
-The original idea was [spoilered in a video](https://www.youtube.com/watch?v=ajGglyQQD0k) about Vuex 5 draft by the maker of Vuex (Kia King Ishii). I never liked Vuex, but this new API made me to want to use it ASAP. So I started to implement it, for fun and for internal use in some hobby project.
+The original idea was [spoilered in a video](https://www.youtube.com/watch?v=ajGglyQQD0k) about Vuex 5 draft by the maker (Kia King Ishii). I never liked the current syntax, but this new API made me to want to use it ASAP. So I started to implement it, for fun and for internal use in some hobby project.
 
 > It's not supposed to be a replacement of Vuex. It's just a fun project for me.
 
-Currently its pretty lighweight: **1.32 KB minified** (618 byte Gzipped) - *with stripped asserts*
+Currently its pretty lightweight: **1.26 KB minified** (625 byte Gzipped) - *with stripped asserts*
 
-It's supports plugins (hooks API was not in the shown draft) and app-scoped stores, but bad TypeScript support (working on it).
+It's supports plugins, app-scoped stores and TypeScript.
 
 
 
-> **Do NOT use it in production** environment. It's under continous refactor, and as soon as Vuex 5 released it's will be useless anyway.
+> **Do NOT use it in production** environment. It's under continuous refactor, and as soon as Vuex 5 released it's will be useless anyway.
 
 
 
@@ -147,7 +147,7 @@ app.mount('#el');
 
 # Plugins
 
-> Plugins was not really explained in the video (outside of the provide function) so the hooks bellow are my own implementation and will be different in Vuex 5 (and it's still under refactor for better TypeScript support)
+> Plugins was not really explained in the video (outside of the provide function) so the hooks bellow are my own implementation and will be different in Vuex 5
 
 ### Providing your plugin
 
