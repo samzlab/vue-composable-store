@@ -1,4 +1,4 @@
-import { createVueStore, defineStore, useStore } from '../src/';
+import { createVueStore, defineStore, OnActionCallback, StorePlugin, useStore } from '../src/';
 import { computed, createApp, nextTick, ref } from 'vue';
 
 const body = document.body;
@@ -175,5 +175,76 @@ describe('Store composition and multi-app, plugins', () => {
 		expect(myStoreSetup).toBeCalledTimes(2);
 	});
 
+
+});
+
+
+function createHost() {
+    return document.createElement('div');
+}
+
+describe('plugin system', () => {
+
+    const onInitCallback = jest.fn((name, instance, context) => {});
+    const onUseCallback = jest.fn((name, instance, context) => {});
+    const onActionCallback = jest.fn((name, instance, action, args, result, context) => {});
+    const onMutateCallback = jest.fn((name, instance, key, value, old, context) => {});
+
+    const mockedAction = jest.fn(( a: string, b: string, c: number ) => { return 'd' });
+
+    const plugin: StorePlugin = (provide, { onInitialized, onUse, onAction, onMutate }) => {
+        onInitialized(onInitCallback);
+        onUse(onUseCallback);
+        onAction(onActionCallback);
+        onMutate(onMutateCallback);
+    };
+
+    const testStore = defineStore('test', () => {
+        return {
+            status: ref(null),
+            moo: mockedAction
+        };
+    });
+
+    const compoundStore = defineStore('compound', ({ use }) => {
+        const test = use(testStore);
+        test.status.value = 'success';
+        test.moo('a', 'b', 'c');
+        return {};
+    });
+
+    let exposedTestStore;
+    const app = createApp({
+        setup() {
+            exposedTestStore = useStore(testStore); // <-- "test" onInit.
+            useStore(compoundStore);                // <-- "compound" onInit. (+"test" onUse)
+
+            return () => '';
+        }
+    }).use(createVueStore({
+        plugins: [ plugin ]
+    })).mount(createHost());
+
+    test('should call onInitialize on useStore()', () => {
+        expect(onInitCallback).toBeCalledWith('test', expect.anything(), expect.anything());
+    });
+
+    test('should not call onInitialize twice for the same store', () => {
+        expect(onInitCallback).toBeCalledWith('compound', expect.anything(), expect.anything());
+        expect(onInitCallback).toBeCalledTimes(2);
+    });
+
+    test('should call onUse when reused', () => {
+        expect(onUseCallback).toBeCalledTimes(1);
+    });
+
+    test('should call onAction when a store function invoked', () => {
+        expect(onActionCallback).toBeCalledWith('test', expect.anything(), 'moo', ['a', 'b', 'c'], 'd', expect.anything());
+    });
+
+    test('should call onMutate only once when a store property mutated', () => {
+        expect(onMutateCallback).toBeCalledWith('test', expect.anything(), 'status', 'success', null, expect.anything());
+        expect(onMutateCallback).toBeCalledTimes(1);
+    });
 
 });

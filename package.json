@@ -15,7 +15,7 @@
     "store"
   ],
   "scripts": {
-    "test": "jest",
+    "test": "jest --coverage",
     "build:coverage": "make-coverage-badge",
     "build": "rollup -c",
     "prerelease": "npm test && npm run build:coverage && npm run build",

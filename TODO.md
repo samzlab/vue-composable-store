@@ -4,7 +4,8 @@
 * [ ] eslint-typescript check
 * [x] test negative branches
 * [x] accept options in the vue-plugin initialization: `app.use(store, { plugins?: [] })`
-* [ ] plugin hooks
+* [x] plugin hooks
+* [ ] Better TypeScript support in useStore(), use() and in StoreContext
 * [ ] example projects
 
 

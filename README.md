@@ -2,13 +2,19 @@
 
 # Vue composable store
 
-The idea is not mine, it's actually just rapid and super-simple implementation of the [spoilered](https://www.youtube.com/watch?v=ajGglyQQD0k) Vuex 5 draft by the maker of Vuex (Kia King Ishii). I fell in love with this API (I didn't even liked Vuex before). Then I felt I want to use it **NOW**, so started to work on this a few hours ago... and here we go, it's working! :)
+The original idea was [spoilered in a video](https://www.youtube.com/watch?v=ajGglyQQD0k) about Vuex 5 draft by the maker of Vuex (Kia King Ishii). I never liked Vuex, but this new API made me to want to use it ASAP. So I started to implement it, for fun and for internal use in some hobby project.
 
-It's far from perfect, but I had a lot of fun implementing it even if it's just 47 LoC (compiled JS, the source is 70 with the type defs in TS).
+> It's not supposed to be a replacement of Vuex. It's just a fun project for me.
+
+Currently its pretty lighweight: **1.32 KB minified** (618 byte Gzipped) - *with stripped asserts*
+
+It's supports plugins (hooks API was not in the shown draft) and app-scoped stores, but bad TypeScript support (working on it).
 
 
 
-> Do NOT use it in production environment. As soon as Vuex 5 released it's will be useless anyway.
+> **Do NOT use it in production** environment. It's under continous refactor, and as soon as Vuex 5 released it's will be useless anyway.
+
+
 
 ## Peer dependencies
 
@@ -24,38 +30,42 @@ npm i vue-composable-store
 
 
 
+> **NOTE:** There is a "hidden" production build in the dist folder which is ~30% smaller due to stripped asserts.
+>
+> ```js
+> import { createVueStore } from 'vue-composable-store/dist/index-prod-es.js';
+> ```
+
+
+
 ## Usage
 
->  It's designed to use with the new composition api, **you can't use it with the options API**! Sry...
+>  **The Options API not supported!**
 
-# defineStore() + use()
+# defineStore() - the way you define your store
 
 ```js
 import { readonly, reactive, ref, computed } from 'vue';
 import { defineStore } from 'vue-store';
 
-// imported just in the component which using the store,
-// so it's can be properly code-splitted/tree-shanek, etc
-import cartStore from './stores/cart';
-
-export default defineStore('shop', ({ use, myApi }) => {
+export default defineStore('shop', () => {
+    // state
     const list = reactive([]);
     const page = ref(1);
     const limit = ref(20);
     
+    // actions
     const hasNext = computed(() => {
         return list.length === limit;
-    });
-    
-    const cart = use(cartStore); // <--- store composition
+    });  
     
     async function load(page) {
-        list.length = 0;
-        list.push(...await myApi('/products/'));
+        // ...fetch data into `list`...
+        page.value = page;
     }
     
+    // final store object
     return {
-        cart,
         hasNext,
         list: readonly(list), // <---- in case you do not want it to be modifiable from outside
         page, 
@@ -64,9 +74,37 @@ export default defineStore('shop', ({ use, myApi }) => {
 });
 ```
 
+## use() - the way you compose stores (replacement for store modules)
+
+```js
+import { readonly, reactive, ref, computed } from 'vue';
+import { defineStore } from 'vue-store';
+
+// imported just in the component which using the store,
+// so it's can be properly code-splitted/tree-shaken, etc
+import cartStore from './stores/cart';
+
+export default defineStore('shop', ({ use }) => {
+    // state
+    const products = reactive([]);
+    
+    async function load(page) {
+        // ...fetch data into `list`...
+        page.value = page;
+    }
+    
+    // final store object
+    return {
+        cart: use(cartStore), // <--- store composition instead of store modules
+        products,
+        load
+    };
+});
+```
 
 
-## useStore()
+
+## useStore() - the way you access your store in components
 
 ```js
 import { defineComponent } from 'vue';
@@ -76,7 +114,7 @@ import productsStore from './stores/products';
 export default defineComponent({
     name: 'ProductList',
     setup() {
-        // it's not registered until the first time, then it's reused next time (per app)
+        // the store lazy initialized on the first use
         const { load, list, hasNext } = useStore(productsStore); 
         
         load(1);
@@ -91,15 +129,16 @@ export default defineComponent({
 
 
 
-## createStore()
+## createStore() - how you connect it to your app
 
 ```js
 import { createApp } from 'vue';
 import { createVueStore } from 'vue-composable-store';
 import App from './App.vue';
 
-const app = createApp(App);
 const store = createVueStore();
+
+const app = createApp(App);
 app.use(store);
 app.mount('#el');
 ```
@@ -108,22 +147,121 @@ app.mount('#el');
 
 # Plugins
 
+> Plugins was not really explained in the video (outside of the provide function) so the hooks bellow are my own implementation and will be different in Vuex 5 (and it's still under refactor for better TypeScript support)
+
+### Providing your plugin
+
+Plugins can provide utility function or data object to be exposed in the `storeContext`. 
+
 ```js
-// my-plugin.js
-export default function(provide) {
-    provide('mylib', mylib); // <--- i dont like this method, but i wanted to stay close to the draft
+// api-plugin.js
+export default (provide) => {
+    provide('api', (uri) => fetch(`https://localhost:5000/${uri}`));
 }
 
-// app.js
-import myPlugin from './my-plugin';
-const vueStore = createVueStore({
-    plugins: [ myPlugin ]
-});
 
-// myStore.js
-defineStore('my-store', ({ mylib }) => {  // <--- get the plugins in the passed context
-    mylib(); 
-});
+// app.js
+import { createApp } from 'vue';
+import { createVueStore } from 'vue-composable-store';
+import apiPlugin from './api-plugin.js';
+import App from './App.vue';
+
+const options = { plugins: [ apiPlugin ] };
+const vueStore = createVueStore(options);
+const app = createApp(App);
+app.use(vueStore); 
+// optionally you can pass the `options` at the app.use() too
+// in this case the plugin list will be overridden
+// app.use(vueStore, options)
+
+
+// my-store.js
+export default defineStore(('my-store', ({ api }) => { // <-- `api` in the context
+    // you can use your api() plugin here... 
+    return {};
+}));
+```
+
+
+
+### Hooks
+
+The usable hooks are passed in the second argument of the plugin.
+
+```js
+// my-plugin.js
+export default function myPlugin(provide, hooks) => { /* plugin code */};
+```
+
+The first two arguments passed to the callback functions are always:
+
+* The `name` of the store which triggered the callback
+* The `storeInstance` contains the exact object which is returned from the initializer function passed to `defineStore()`. 
+
+
+
+`onUse(callback: (storeName, storeInstance, context) => void)`
+
+Called every time a store is being accessed by the `useStore()` or composed via `use()`.
+
+The `context` is the same as in the `defineStore` , you can use it to access or detect other plugins
+
+**Example:**
+
+```js
+// my-store-logger.js
+export default function logger(provide, { onUse }) {
+    onUse((name, instance, context) => {
+        console.log(`Used: "${name}"`);
+    });
+}
+```
+
+
+
+`onInitialized(callback: (storeName, storeInstance, context) => void)`
+
+Called once per store per app after the first time usage of `useStore()` or composed via `use()`
+
+```js
+// my-store-logger.js
+export default function logger(provide, { onInitialized }) {
+    onInitialized((name, instance, context) => {
+        console.log(`[Initialized] Store name: "${name}"`);
+    });
+}
+```
+
+
+
+`onAction(callback: (storeName, storeInstance, actionName, actionArgs, actionResult, context) => void)`
+
+Called after a store function invoked.
+
+```js
+// my-store-logger.js
+export default function logger(provide, { onAction }) {
+    onAction((name, instance, action, actionArgs, actionResult, context) => {
+        console.log(`[Action invoked] Store action: "${name}.${action}"`);
+        console.log(`  args: ${actionArgs.map(JSON.stringify).join(', ')}`)
+        console.log(`  return value: ${JSON.stingify(actionResult)}`);
+    });
+}
+```
+
+`onMutated(callback: (storeName, storeInstance, stateKey, value, oldValue, context) => void)`
+
+Called when any watchable store property mutated (the value changed).
+
+```js
+// my-store-logger.js
+export default function logger(provide, { onMutated }) {
+    onMutated((name, instance, key, newValue, oldValue, context) => {
+        const oldJSON = JSON.encode(oldValue);
+        const newJSON = JSON.encode(newValue);
+        console.log(`[State mutated] "${name}.${key}" is being mutated from ${oldJSON} to ${newJSON}`);
+    });
+}
 ```
 
 
