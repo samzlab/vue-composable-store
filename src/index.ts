@@ -156,9 +156,8 @@ export function createVueStore(options1: StoreOptions = {}): Plugin {
 				instance.context[pluginName] = data;
 			};
 
-
 			const hooks: StorePluginHooks = {
-				onInitialized: use.push.bind(init),
+				onInitialized: init.push.bind(init),
 				onUse: use.push.bind(use),
 				onAction: action.push.bind(action),
 				onMutate: mutate.push.bind(mutate)
