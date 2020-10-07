@@ -6,7 +6,7 @@ The original idea was [spoilered in a video](https://www.youtube.com/watch?v=ajG
 
 > It's not supposed to be a replacement of Vuex. It's just a fun project for me.
 
-Currently its pretty lightweight: **1.26 KB minified** (625 byte Gzipped) - *with stripped asserts*
+Currently its pretty lightweight: **1.23 KB minified** (619 byte Gzipped) - *with stripped asserts*
 
 It's supports plugins, app-scoped stores and TypeScript.
 
@@ -74,17 +74,17 @@ export default defineStore('shop', () => {
 });
 ```
 
-## use() - the way you compose stores (replacement for store modules)
+## Compose stores (replacement for store modules)
 
 ```js
-import { readonly, reactive, ref, computed } from 'vue';
-import { defineStore } from 'vue-store';
+import { readonly, reactive } from 'vue';
+import { defineStore, useStore } from 'vue-store';
 
-// imported just in the component which using the store,
+// imported just in the store/compont which composing,
 // so it's can be properly code-splitted/tree-shaken, etc
 import cartStore from './stores/cart';
 
-export default defineStore('shop', ({ use }) => {
+export default defineStore('shop', () => {
     // state
     const products = reactive([]);
     
@@ -95,16 +95,12 @@ export default defineStore('shop', ({ use }) => {
     
     // final store object
     return {
-        cart: use(cartStore), // <--- store composition instead of store modules
+        cart: useStore(cartStore), // <--- store composition instead of store modules
         products,
         load
     };
 });
 ```
-
-
-
-## useStore() - the way you access your store in components
 
 ```js
 import { defineComponent } from 'vue';
@@ -146,10 +142,6 @@ app.mount('#el');
 
 
 # Plugins
-
-> Plugins was not really explained in the video (outside of the provide function) so the hooks bellow are my own implementation and will be different in Vuex 5
-
-### Providing your plugin
 
 Plugins can provide utility function or data object to be exposed in the `storeContext`. 
 

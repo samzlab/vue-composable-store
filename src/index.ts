@@ -22,7 +22,6 @@ export interface StoreDefinition<T> {
 }
 
 export interface StoreContext {
-    use: <T>(storeDefinition: StoreDefinition<T>) => T,
     [pluginName: string]: unknown
 }
 
@@ -141,9 +140,7 @@ export function createVueStore(options1: StoreOptions = {}): Plugin {
 
 		const instance: VueStoreInstance = {
 			stores: {},
-			context: {
-				use: <T>(storeDefinition: StoreDefinition<T>): T => registerStore(instance, storeDefinition)
-			},
+			context: {},
 			listeners: { use, init, action, mutate }
 		};
 

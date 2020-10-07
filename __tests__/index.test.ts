@@ -119,8 +119,8 @@ describe('Validations', () => {
 
 describe('Store composition and multi-app, plugins', () => {
 
-	const composedStore = defineStore('composed', ({ use, prefix }) => {
-		const { count } = use(myStore);
+	const composedStore = defineStore('composed', ({ prefix }) => {
+		const { count } = useStore(myStore);
 		// @ts-expect-error can't type plugins... yet :/
 		const plusOne = computed(() => `${prefix()} ${count.value + 1}`);
 
@@ -202,8 +202,8 @@ describe('plugin system', () => {
 		};
 	});
 
-	const compoundStore = defineStore('compound', ({ use }) => {
-		const test = use(testStore);
+	const compoundStore = defineStore('compound', () => {
+		const test = useStore(testStore);
 		test.status.value = 'success';
 		test.moo('a', 'b', 1);
 		return {};
